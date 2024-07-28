@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-
-posts = [
+from .models import Post
+dummy_posts = [
         {
             'author': 'VeggieCode',
             'title': 'Blog Post 1',
@@ -19,7 +19,7 @@ posts = [
 # Create your views here.
 def home(request):    
     context = {
-        'posts': posts
+        'posts': Post.objects.all()
     }
     return render(request, 'blog/home.html', context)
 
