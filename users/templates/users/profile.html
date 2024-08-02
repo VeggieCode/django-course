@@ -1,0 +1,6 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    {# This is not a variable that we need to provide. Django does#}
+    <h1>{{user.username}}</h1>
+{% endblock %} 

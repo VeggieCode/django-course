@@ -130,3 +130,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
+
+#DJANGO LOGIN SYSTEM CONF
+#This sets the default redirect after success login if you are using LoginView from django.contrib.auth
+LOGIN_URL = 'login' # default value: accounts/login/
+LOGIN_REDIRECT_URL = 'blog-home' # default value: accounts/profile/
