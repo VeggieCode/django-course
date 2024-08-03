@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -121,6 +122,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+#Donde se guardaran los archivos media subidos
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # FULL PATH donde buscara django los archivos guardados y los subidos se guardaran.
+MEDIA_URL = '/media/'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -133,5 +138,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 #DJANGO LOGIN SYSTEM CONF
 #This sets the default redirect after success login if you are using LoginView from django.contrib.auth
-LOGIN_URL = 'login' # default value: accounts/login/
 LOGIN_REDIRECT_URL = 'blog-home' # default value: accounts/profile/
+
+#View showed if trying to accesing a protected route and other uses cases
+LOGIN_URL = 'login' # default value: accounts/login/
