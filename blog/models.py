@@ -13,8 +13,8 @@ class Post(models.Model):
     def __str__(self):
         return self.title
     
-    # getting a path from a particular route
-    # reverse from a
+    #Redirect of the ModelForm of this Model."    
     def get_absolute_url(self):
+        #This translates to "GET post-detail/<pk>/
         return reverse("post-detail", kwargs={"pk": self.pk})
     

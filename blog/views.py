@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post
 dummy_posts = [
@@ -24,27 +25,50 @@ def home(request):
     }
     return render(request, 'blog/home.html', context)
 
+# ListViews, DetailViews, CreateViews, UpdateViews, DeleteViews
 class PostListView(ListView):
-    #What model to query
+    #What model to query in order to create the list
     model = Post
+    
     # When calling ClassView.as_view() this tries to render a template with the next syntax:
+    # On this case we are changing the default template to render blog/home.html
     template_name = 'blog/home.html' #default: <app>/<model>_<viewtype>.html
+
+    #By default ClassListView sets the dictionary context with the key "object_list" containing the
+    #post list.
+    #In order to change this behaviour we can customise the name overriding the next propertie:
     context_object_name = 'posts' # Name of the key-value dictionary
-    ordering = ['-date_posted'] # - symbol changes the order to descending
+
+    #Also we can determine the order and attribute of the list:
+    # Symbol: - Descending order
+    # Symbol: + Ascending order
+    ordering = ['-date_posted'] # - symbol changes the order to descending  "
 
 class PostDetailView(DetailView):
+    # DetailView search by default for the template name with the next convention:
+    # <app>/<model>_detail.html
+    # template_name = blog/post_detail.html
+
     #What model to query
-    model = Post    
+    model = Post
+
+    #context name of the model by default is 'object'
+    # context_object_name = 'object'
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     #What model to query
     model = Post
+    
+    #Fields to be modified by the view
     fields = ['title', 'content']
+    
     #default: template_name: <model>_form.html
 
     def form_valid(self, form):
+        # We need add the author of the post before saving it to the database
         form.instance.author = self.request.user # Current login user asigned to author field on form
         return super().form_valid(form) # This calls get_absolute_url on the model if defined.     
+    
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     #What model to query
     model = Post
@@ -57,19 +81,34 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     # This method is overriding on UserPassesTestMixin class, which is called to evaluate a condition using the
     # current model on the model form
-    def test_func(self):
+    def test_func(self):        
+        return self.is_owner()
+    
+    def is_owner(self):
         post = self.get_object()
-        if self.request.user == post.author:
-            is_authorized = True
-        else:
-            is_authorized = False
-        return is_authorized
+        return self.request.user == post.author            
 
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    #What model to affect
+    model = Post
+
+    # Where to redirect the user when confirm deletion and this succed
+    success_url = reverse_lazy('blog-home')
+    #Template name for delete view by default follows the next convention:
+    # <model>_confirm_delete.html
+    # template_name = "post_confirm_delete.html"
+
+    # This method is overriding on UserPassesTestMixin class, which is called to evaluate a condition using the
+    # current model on the model form
+    def test_func(self):        
+        return self.is_owner()
+    
+    def is_owner(self):
+        post = self.get_object()
+        return self.request.user == post.author
 
 def about(request):
     context = {
         'title': 'About'
     }
     return render(request, 'blog/about.html', context)
-
-# ListViews, DetailViews, CreateViews, UpdateViews, DeleteViews
