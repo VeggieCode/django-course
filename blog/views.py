@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import User
 from .models import Post
 dummy_posts = [
         {
@@ -43,6 +44,28 @@ class PostListView(ListView):
     # Symbol: - Descending order
     # Symbol: + Ascending order
     ordering = ['-date_posted'] # - symbol changes the order to descending  "
+
+    #It is not neccesary import paginator module
+    paginate_by = 5
+
+class UserPostListView(ListView):    
+    model = Post        
+    template_name = 'blog/user_posts.html' #default: <app>/<model>_<viewtype>.html    
+    context_object_name = 'posts' # Name of the key-value dictionary
+
+    #Since we are overriding the QuerySet from the parent, we are ignoring de OrderBy from before
+    # ordering = ['-date_posted']
+
+    #It is not neccesary import paginator module
+    paginate_by = 5
+
+    # In order to modify the queryset from this list view
+    def get_queryset(self):
+        #if dont exist that user we are show 404
+        user = get_object_or_404(User, username=self.kwargs.get('username'))
+        #Since we are overriding the QuerySet from the parent, we are ignoring de OrderBy written above
+        return Post.objects.filter(author=user).order_by('-date_posted')
+
 
 class PostDetailView(DetailView):
     # DetailView search by default for the template name with the next convention:

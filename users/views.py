@@ -16,11 +16,17 @@ def register(request):
     return render(request, 'users/register.html', context={'form': user_creation_form})
 
 @login_required
-def profile(request):    
+def profile(request):
+    try:
+        profile = request.user.profile
+    except Profile.DoesNotExist:
+        profile = Profile(user=request.user)
+        profile.save()
+
     if request.method == 'POST':
         # Due this are model forms we can populate them with model instances.    
         u_form = UserUpdateForm(data=request.POST, instance=request.user)
-        p_form = ProfileUpdateForm(data=request.POST, files=request.FILES, instance=request.user.profile)
+        p_form = ProfileUpdateForm(data=request.POST, files=request.FILES, instance=profile)
 
         if u_form.is_valid() and p_form.is_valid():
             u_form.save()
@@ -29,7 +35,7 @@ def profile(request):
             return redirect('profile') # POST, GET, redirect pattern
     else:                
         u_form = UserUpdateForm(instance=request.user)        
-        p_form = ProfileUpdateForm(instance=request.user.profile)        
+        p_form = ProfileUpdateForm(instance=profile)        
 
     context = {
         'u_form': u_form,
