@@ -142,3 +142,12 @@ LOGIN_REDIRECT_URL = 'blog-home' # default value: accounts/profile/
 
 #View showed if trying to accesing a protected route and other uses cases
 LOGIN_URL = 'login' # default value: accounts/login/
+
+
+#DJANGO EMAIL
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
